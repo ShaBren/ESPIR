@@ -304,7 +304,8 @@ void CommandProcessor::handleResetCommand(const JsonDocument &cmd)
   DEBUG_PRINTLN("Handling RESET command");
 
   String resetType = "soft"; // Default value
-  if (cmd.containsKey("parameters")) {
+  if (cmd.containsKey("parameters"))
+  {
     resetType = cmd["parameters"]["type"] | String("soft");
   }
 
@@ -366,12 +367,14 @@ void CommandProcessor::sendError(const String &error, const String &details)
 
 bool CommandProcessor::validateCommand(const JsonDocument &cmd, const String requiredFields[], int fieldCount)
 {
-  if (!cmd.containsKey("parameters")) {
+  if (!cmd.containsKey("parameters"))
+  {
     DEBUG_PRINTLN("Missing parameters object");
     return false;
   }
-  
-  if (!cmd["parameters"].is<JsonObject>()) {
+
+  if (!cmd["parameters"].is<JsonObject>())
+  {
     DEBUG_PRINTLN("Parameters is not an object");
     return false;
   }

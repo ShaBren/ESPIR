@@ -101,7 +101,7 @@ void CommandProcessor::handleLearnCommand(const JsonDocument &cmd)
     responseData["timeout"] = timeout;
     responseData["status"] = "learning";
 
-    sendResponse(RESP_OK, "IR learning started", responseData);
+    sendResponse(RESP_OK, "IR learning started", &responseData);
 
     // Wait for learning completion or timeout
     unsigned long startTime = millis();
@@ -119,7 +119,7 @@ void CommandProcessor::handleLearnCommand(const JsonDocument &cmd)
       learnedData["value"] = String(learnedCode.data, HEX);
       learnedData["bits"] = learnedCode.bits;
 
-      sendResponse(RESP_OK, "IR code learned successfully", learnedData);
+      sendResponse(RESP_OK, "IR code learned successfully", &learnedData);
     }
     else
     {
@@ -166,7 +166,7 @@ void CommandProcessor::handleTransmitCommand(const JsonDocument &cmd)
     responseData["device"] = deviceName;
     responseData["command"] = commandName;
 
-    sendResponse(RESP_OK, "IR command transmitted successfully", responseData);
+    sendResponse(RESP_OK, "IR command transmitted successfully", &responseData);
   }
   else
   {
@@ -188,7 +188,7 @@ void CommandProcessor::handleListDevicesCommand(const JsonDocument &cmd)
   DynamicJsonDocument deviceList(2048);
   deserializeJson(deviceList, deviceListJson);
 
-  sendResponse(RESP_OK, "Device list retrieved", deviceList);
+  sendResponse(RESP_OK, "Device list retrieved", &deviceList);
 }
 
 void CommandProcessor::handleAddDeviceCommand(const JsonDocument &cmd)
@@ -222,7 +222,7 @@ void CommandProcessor::handleAddDeviceCommand(const JsonDocument &cmd)
     responseData["device"] = device.name;
     responseData["type"] = device.type;
 
-    sendResponse(RESP_OK, "Device added successfully", responseData);
+    sendResponse(RESP_OK, "Device added successfully", &responseData);
   }
   else
   {
@@ -255,7 +255,7 @@ void CommandProcessor::handleDeleteDeviceCommand(const JsonDocument &cmd)
     DynamicJsonDocument responseData(256);
     responseData["device"] = deviceName;
 
-    sendResponse(RESP_OK, "Device deleted successfully", responseData);
+    sendResponse(RESP_OK, "Device deleted successfully", &responseData);
   }
   else
   {
@@ -294,7 +294,7 @@ void CommandProcessor::handleGetStatusCommand(const JsonDocument &cmd)
   statusData["uptime"] = millis();
   statusData["freeHeap"] = ESP.getFreeHeap();
 
-  sendResponse(RESP_OK, "System status retrieved", statusData);
+  sendResponse(RESP_OK, "System status retrieved", &statusData);
 }
 
 void CommandProcessor::handleResetCommand(const JsonDocument &cmd)
@@ -357,7 +357,7 @@ void CommandProcessor::sendError(const String &error, const String &details)
     errorData["details"] = details;
   }
 
-  sendResponse(RESP_ERROR, "Command failed", errorData);
+  sendResponse(RESP_ERROR, "Command failed", &errorData);
 }
 
 bool CommandProcessor::validateCommand(const JsonDocument &cmd, const String requiredFields[], int fieldCount)

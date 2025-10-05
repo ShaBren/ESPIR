@@ -15,7 +15,7 @@
 struct IRCode
 {
     decode_type_t protocol;
-    uint64_t data;  // Changed from 'value' to 'data' for consistency
+    uint64_t data; // Changed from 'value' to 'data' for consistency
     uint16_t bits;
     uint16_t *rawData;
     uint16_t rawLen;

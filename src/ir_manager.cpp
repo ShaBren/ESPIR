@@ -50,7 +50,7 @@ void IRManager::update()
         {
             lastLearned.rawLen = results.rawlen;
             lastLearned.rawData = new uint16_t[results.rawlen];
-            memcpy(lastLearned.rawData, (const void*)results.rawbuf, results.rawlen * sizeof(uint16_t));
+            memcpy(lastLearned.rawData, (const void *)results.rawbuf, results.rawlen * sizeof(uint16_t));
         }
 
         learning = false;

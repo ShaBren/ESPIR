@@ -3,6 +3,7 @@
  */
 
 #include "ble_manager.h"
+#include <ArduinoJson.h>
 
 // Server Callbacks Implementation
 void BLEManager::ServerCallbacks::onConnect(NimBLEServer *pServer)

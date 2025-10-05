@@ -116,7 +116,7 @@ void CommandProcessor::handleLearnCommand(const JsonDocument &cmd)
       IRCode learnedCode = irManager->getLearnedCode();
       DynamicJsonDocument learnedData(512);
       learnedData["protocol"] = typeToString(learnedCode.protocol);
-      learnedData["value"] = String(learnedCode.value, HEX);
+      learnedData["value"] = String(learnedCode.data, HEX);
       learnedData["bits"] = learnedCode.bits;
 
       sendResponse(RESP_OK, "IR code learned successfully", learnedData);
@@ -324,7 +324,7 @@ void CommandProcessor::handleResetCommand(const JsonDocument &cmd)
   }
 }
 
-void CommandProcessor::sendResponse(const String &status, const String &message, const JsonDocument &data)
+void CommandProcessor::sendResponse(const String &status, const String &message, DynamicJsonDocument *data)
 {
   DynamicJsonDocument response(1024);
 
@@ -332,9 +332,9 @@ void CommandProcessor::sendResponse(const String &status, const String &message,
   response["message"] = message;
   response["timestamp"] = millis();
 
-  if (!data.isNull())
+  if (data != nullptr)
   {
-    response["data"] = data;
+    response["data"] = *data;
   }
 
   String responseJson;

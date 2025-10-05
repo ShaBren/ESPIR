@@ -3,10 +3,12 @@
  */
 
 #include "ir_manager.h"
+#include <ArduinoJson.h>
 
-IRManager::IRManager() : irSend(nullptr), irRecv(nullptr), learning(false)
+IRManager::IRManager() : irSend(nullptr), irRecv(nullptr), learning(false), learnStartTime(0)
 {
     memset(&lastLearned, 0, sizeof(IRCode));
+    memset(&results, 0, sizeof(decode_results));
 }
 
 IRManager::~IRManager()
@@ -40,7 +42,7 @@ void IRManager::update()
     {
         // Copy the decoded result to lastLearned
         lastLearned.protocol = results.decode_type;
-        lastLearned.value = results.value;
+        lastLearned.data = results.value; // Fixed: use 'data' field
         lastLearned.bits = results.bits;
 
         // Copy raw data if available
@@ -48,7 +50,7 @@ void IRManager::update()
         {
             lastLearned.rawLen = results.rawlen;
             lastLearned.rawData = new uint16_t[results.rawlen];
-            memcpy(lastLearned.rawData, results.rawbuf, results.rawlen * sizeof(uint16_t));
+            memcpy(lastLearned.rawData, (const void*)results.rawbuf, results.rawlen * sizeof(uint16_t));
         }
 
         learning = false;
@@ -85,16 +87,16 @@ bool IRManager::transmitCode(const IRCode &code)
         switch (code.protocol)
         {
         case NEC:
-            irSend->sendNEC(code.value, code.bits);
+            irSend->sendNEC(code.data, code.bits);
             break;
         case SONY:
-            irSend->sendSony(code.value, code.bits);
+            irSend->sendSony(code.data, code.bits);
             break;
         case RC5:
-            irSend->sendRC5(code.value, code.bits);
+            irSend->sendRC5(code.data, code.bits);
             break;
         case RC6:
-            irSend->sendRC6(code.value, code.bits);
+            irSend->sendRC6(code.data, code.bits);
             break;
         default:
             DEBUG_PRINTLN("Unsupported protocol");
@@ -147,7 +149,7 @@ String IRManager::encodeIRCode(const IRCode &code)
     DynamicJsonDocument doc(1024);
 
     doc["protocol"] = typeToString(code.protocol);
-    doc["value"] = String(code.value, HEX);
+    doc["value"] = String(code.data, HEX);
     doc["bits"] = code.bits;
     doc["description"] = code.description;
 
@@ -174,7 +176,7 @@ IRCode IRManager::decodeIRCode(const String &encoded)
     deserializeJson(doc, encoded);
 
     code.protocol = strToDecodeType(doc["protocol"]);
-    code.value = strtoll(doc["value"], nullptr, 16);
+    code.data = strtoll(doc["value"], nullptr, 16);
     code.bits = doc["bits"];
     code.description = doc["description"].as<String>();
 
@@ -197,7 +199,7 @@ void IRManager::printIRCode(const IRCode &code)
     DEBUG_PRINT("Protocol: ");
     DEBUG_PRINTLN(typeToString(code.protocol));
     DEBUG_PRINT("Value: 0x");
-    DEBUG_PRINTLN(String(code.value, HEX));
+    DEBUG_PRINTLN(String(code.data, HEX));
     DEBUG_PRINT("Bits: ");
     DEBUG_PRINTLN(code.bits);
     if (code.rawLen > 0)

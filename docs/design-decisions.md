@@ -21,10 +21,14 @@ This document outlines key design decisions made during the ESPIR project implem
 - **Fields**: name, type, manufacturer, model, commands[]
 - **Question for You**: Do you need additional metadata fields (room, category, icon, etc.)?
 
+Answer: Nope, a simple heirarchy is fine.
+
 ### 4. BLE Security
 **Decision**: Basic pairing without additional encryption
 - **Current**: Standard BLE pairing
 - **Question for You**: Do you need additional security layers for sensitive environments?
+
+Answer: Nope, this will be used in the general public environment, no special security concerns. Ease of use is critical.
 
 ### 5. Error Handling Strategy
 **Decision**: Graceful degradation with user feedback
@@ -44,6 +48,7 @@ This document outlines key design decisions made during the ESPIR project implem
 // - Custom/proprietary protocols?
 // - Air conditioner protocols (complex state)?
 ```
+Answer: The basics is fine.
 
 ### 2. Device Categories
 ```kotlin
@@ -54,6 +59,7 @@ This document outlines key design decisions made during the ESPIR project implem
 // - Custom icons for each category?
 // - Room-based organization?
 ```
+Answer: Free-form is fine.
 
 ### 3. User Interface Preferences
 ```xml
@@ -66,6 +72,8 @@ Question: Do you prefer:
 - Tablet-specific layouts?
 -->
 ```
+
+Answer: Dark/light toggle would be excellent. No other special features required. Priority should be ease of use.
 
 ### 4. Hardware Customizations
 ```
@@ -81,6 +89,8 @@ Questions:
 - Battery operation requirements?
 ```
 
+Answer: Not at this time. Some of these may be considered for the future.
+
 ### 5. Cloud Integration
 ```
 Current: Local-only operation
@@ -91,6 +101,8 @@ Questions:
 - Device sharing between users?
 - Analytics and usage tracking?
 ```
+
+Answer: None of these are necessary at this time.
 
 ### 6. Advanced Features
 ```
@@ -117,6 +129,8 @@ Potential Enhancements:
 
 Question: Which of these features are priorities?
 ```
+
+Answer: Priority should be given to basic functionality and ease of use.
 
 ## 📝 Configuration Templates
 

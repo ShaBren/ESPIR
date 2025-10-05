@@ -29,11 +29,11 @@ private:
     void handleResetCommand(const JsonDocument &cmd);
 
     // Response helpers
-    void sendResponse(const String &status, const String &message = "", const JsonDocument &data = JsonDocument());
+    void sendResponse(const String &status, const String &message = "", DynamicJsonDocument *data = nullptr);
     void sendError(const String &error, const String &details = "");
 
     // Validation helpers
-    bool validateCommand(const JsonDocument &cmd, const String &requiredFields[], int fieldCount);
+    bool validateCommand(const JsonDocument &cmd, const String requiredFields[], int fieldCount);
 
 public:
     CommandProcessor();

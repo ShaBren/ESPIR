@@ -320,8 +320,13 @@ bool DeviceManager::importDevices(const String &jsonData)
         break;
 
       IRCommand command;
+      memset(&command, 0, sizeof(IRCommand)); // Initialize all fields
       command.name = commandObj["name"].as<String>();
       command.description = commandObj["description"].as<String>();
+      // Initialize IR code data
+      command.code.protocol = decode_type_t::UNKNOWN;
+      command.code.data = 0;
+      command.code.bits = 0;
       // Note: IR code data would be deserialized here
 
       device.commands[device.commandCount] = command;

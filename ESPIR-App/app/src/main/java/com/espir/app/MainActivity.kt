@@ -18,14 +18,16 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import com.espir.app.ble.BleManager
+import com.espir.app.ble.EspirBleManagerSimple
+import com.espir.app.ui.devices.DeviceListActivity
+import com.espir.app.ui.settings.SettingsActivity
 import com.espir.app.viewmodel.MainViewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var viewModel: MainViewModel
-    private lateinit var bleManager: BleManager
+    private lateinit var bleManager: EspirBleManagerSimple
 
     companion object {
         private const val REQUEST_ENABLE_BT = 1
@@ -50,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         
         // Initialize BLE Manager
-        bleManager = BleManager(this)
+        bleManager = EspirBleManagerSimple(this)
         
         // Check BLE support and permissions
         if (!checkBleSupport()) {

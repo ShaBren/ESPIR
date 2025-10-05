@@ -5,7 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.espir.app.ble.EspirBleManager
+import com.espir.app.ble.EspirBleManagerSimple
 import com.espir.app.data.AppDatabase
 import com.espir.app.data.Device
 import com.espir.app.data.DeviceWithCommands
@@ -19,8 +19,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val deviceDao = database.deviceDao()
     private val commandDao = database.irCommandDao()
     
-    private val _bleManager = MutableLiveData<EspirBleManager>()
-    val bleManager: LiveData<EspirBleManager> = _bleManager
+    private val _bleManager = MutableLiveData<EspirBleManagerSimple>()
+    val bleManager: LiveData<EspirBleManagerSimple> = _bleManager
     
     private val _isConnected = MutableLiveData<Boolean>(false)
     val isConnected: LiveData<Boolean> = _isConnected
@@ -31,23 +31,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String> = _errorMessage
     
+    private val _connectionStatus = MutableLiveData<String>("Disconnected")
+    val connectionStatus: LiveData<String> = _connectionStatus
+    
     // Device data
     val allDevices: LiveData<List<Device>> = deviceDao.getAllDevices()
+    val devices: LiveData<List<Device>> = allDevices  // Alias for compatibility
     val devicesWithCommands: LiveData<List<DeviceWithCommands>> = deviceDao.getDevicesWithCommands()
     
     init {
-        _bleManager.value = EspirBleManager(application.applicationContext)
+        _bleManager.value = EspirBleManagerSimple(application.applicationContext)
     }
     
     fun initializeBle() {
         _bleManager.value?.let { manager ->
             manager.connectionState.observeForever { state ->
-                _isConnected.value = state == EspirBleManager.ConnectionState.CONNECTED
-                _statusMessage.value = when (state) {
-                    EspirBleManager.ConnectionState.DISCONNECTED -> "Disconnected"
-                    EspirBleManager.ConnectionState.CONNECTING -> "Connecting..."
-                    EspirBleManager.ConnectionState.CONNECTED -> "Connected"
-                    EspirBleManager.ConnectionState.DISCONNECTING -> "Disconnecting..."
+                _isConnected.value = state == EspirBleManagerSimple.ConnectionState.CONNECTED
+                _connectionStatus.value = when (state) {
+                    EspirBleManagerSimple.ConnectionState.DISCONNECTED -> "Disconnected"
+                    EspirBleManagerSimple.ConnectionState.CONNECTING -> "Connecting..."
+                    EspirBleManagerSimple.ConnectionState.CONNECTED -> "Connected"
+                    EspirBleManagerSimple.ConnectionState.DISCONNECTING -> "Disconnecting..."
                 }
             }
             

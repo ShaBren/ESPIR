@@ -7,10 +7,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import no.nordicsemi.android.ble.BleManager
 
-class EspirBleManager(context: Context) : BleManager(context) {
+class EspirBleManagerSimple(context: Context) : BleManager(context) {
     
     companion object {
-        private const val TAG = "EspirBleManager"
+        private const val TAG = "EspirBleManagerSimple"
     }
     
     private val _connectionState = MutableLiveData<ConnectionState>()
@@ -42,19 +42,27 @@ class EspirBleManager(context: Context) : BleManager(context) {
         }
     }
     
-    override fun onDeviceConnecting(device: BluetoothDevice) {
-        _connectionState.postValue(ConnectionState.CONNECTING)
+    // Connection state changed internally in BleManager
+    fun onConnectionStateChanged(device: BluetoothDevice, state: ConnectionState) {
+        _connectionState.postValue(state)
     }
     
-    override fun onDeviceConnected(device: BluetoothDevice) {
-        _connectionState.postValue(ConnectionState.CONNECTED)
+    // Simple command sending implementation
+    fun sendCommand(command: String) {
+        Log.d(TAG, "Sending command: $command")
+        // TODO: Implement actual BLE command sending
     }
     
-    override fun onDeviceDisconnecting(device: BluetoothDevice) {
-        _connectionState.postValue(ConnectionState.DISCONNECTING)
+    // Simple response callback implementation
+    private var responseCallback: ((String) -> Unit)? = null
+    
+    fun setResponseCallback(callback: (String) -> Unit) {
+        responseCallback = callback
     }
     
-    override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
-        _connectionState.postValue(ConnectionState.DISCONNECTED)
+    // Bluetooth enablement check
+    fun isEnabled(): Boolean {
+        // TODO: Implement actual BLE enablement check
+        return true  // Placeholder - always return true for now
     }
 }

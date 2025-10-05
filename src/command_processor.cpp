@@ -92,8 +92,13 @@ void CommandProcessor::handleLearnCommand(const JsonDocument &cmd)
     return;
   }
 
-  JsonObject params = cmd["parameters"];
-  int timeout = params["timeout"] | IR_TIMEOUT_MS;
+  if (!cmd.containsKey("parameters") || !cmd["parameters"].is<JsonObject>())
+  {
+    sendError("MISSING_PARAMETERS", "Parameters must be a valid object");
+    return;
+  }
+
+  int timeout = cmd["parameters"]["timeout"] | IR_TIMEOUT_MS;
 
   if (irManager->startLearning())
   {
@@ -149,9 +154,8 @@ void CommandProcessor::handleTransmitCommand(const JsonDocument &cmd)
     return;
   }
 
-  JsonObject params = cmd["parameters"];
-  String deviceName = params["device"];
-  String commandName = params["command"];
+  String deviceName = cmd["parameters"]["device"];
+  String commandName = cmd["parameters"]["command"];
 
   IRCommand *irCommand = deviceManager->getCommand(deviceName, commandName);
   if (!irCommand)
@@ -208,12 +212,11 @@ void CommandProcessor::handleAddDeviceCommand(const JsonDocument &cmd)
     return;
   }
 
-  JsonObject params = cmd["parameters"];
   Device device;
-  device.name = params["name"].as<String>();
-  device.type = params["type"].as<String>();
-  device.manufacturer = params["manufacturer"] | String("");
-  device.model = params["model"] | String("");
+  device.name = cmd["parameters"]["name"].as<String>();
+  device.type = cmd["parameters"]["type"].as<String>();
+  device.manufacturer = cmd["parameters"]["manufacturer"] | String("");
+  device.model = cmd["parameters"]["model"] | String("");
   device.commandCount = 0;
 
   if (deviceManager->addDevice(device))
@@ -247,8 +250,7 @@ void CommandProcessor::handleDeleteDeviceCommand(const JsonDocument &cmd)
     return;
   }
 
-  JsonObject params = cmd["parameters"];
-  String deviceName = params["name"];
+  String deviceName = cmd["parameters"]["name"];
 
   if (deviceManager->removeDevice(deviceName))
   {
@@ -301,8 +303,10 @@ void CommandProcessor::handleResetCommand(const JsonDocument &cmd)
 {
   DEBUG_PRINTLN("Handling RESET command");
 
-  JsonObject params = cmd["parameters"];
-  String resetType = params["type"] | String("soft");
+  String resetType = "soft"; // Default value
+  if (cmd.containsKey("parameters")) {
+    resetType = cmd["parameters"]["type"] | String("soft");
+  }
 
   if (resetType == "factory")
   {
@@ -362,11 +366,19 @@ void CommandProcessor::sendError(const String &error, const String &details)
 
 bool CommandProcessor::validateCommand(const JsonDocument &cmd, const String requiredFields[], int fieldCount)
 {
-  JsonObject params = cmd["parameters"];
+  if (!cmd.containsKey("parameters")) {
+    DEBUG_PRINTLN("Missing parameters object");
+    return false;
+  }
+  
+  if (!cmd["parameters"].is<JsonObject>()) {
+    DEBUG_PRINTLN("Parameters is not an object");
+    return false;
+  }
 
   for (int i = 0; i < fieldCount; i++)
   {
-    if (!params.containsKey(requiredFields[i]))
+    if (!cmd["parameters"].containsKey(requiredFields[i]))
     {
       DEBUG_PRINTLN("Missing required field: " + requiredFields[i]);
       return false;

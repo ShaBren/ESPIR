@@ -30,7 +30,7 @@ FIRMWARE_ENV := esp32dev
 FIRMWARE_TARGET := $(BUILD_DIR)/firmware.bin
 
 # Android configuration
-GRADLE := ./ESPIR-App/gradlew
+GRADLE := ./gradlew
 ANDROID_DEBUG_APK := $(ANDROID_DIR)/app/build/outputs/apk/debug/app-debug.apk
 ANDROID_RELEASE_APK := $(ANDROID_DIR)/app/build/outputs/apk/release/app-release.apk
 
@@ -93,7 +93,7 @@ firmware-monitor: check-pio ## Monitor ESP32 serial output
 
 android: check-gradle ## Build Android debug APK
 	@echo "$(BLUE)Building Android debug APK...$(NC)"
-	cd $(ANDROID_DIR) && $(GRADLE) assembleDebug
+	cd $(ANDROID_DIR) && $(GRADLE) :app:assembleDebug
 	@if [ -f $(ANDROID_DEBUG_APK) ]; then \
 		echo "$(GREEN)✓ Android debug build complete: $(ANDROID_DEBUG_APK)$(NC)"; \
 	else \
@@ -245,14 +245,15 @@ check-pio: ## Check PlatformIO installation
 	@echo "$(GREEN)✓ PlatformIO found$(NC)"
 
 check-gradle: ## Check Gradle wrapper
-	@test -f $(GRADLE) || { \
-		echo "$(RED)✗ Gradle wrapper not found at $(GRADLE)$(NC)"; \
+	@test -f $(ANDROID_DIR)/gradlew || { \
+		echo "$(RED)✗ Gradle wrapper not found at $(ANDROID_DIR)/gradlew$(NC)"; \
 		exit 1; \
 	}
-	@test -x $(GRADLE) || { \
+	@test -x $(ANDROID_DIR)/gradlew || { \
 		echo "$(RED)✗ Gradle wrapper not executable$(NC)"; \
 		exit 1; \
 	}
+	@echo "$(GREEN)✓ Gradle wrapper found$(NC)"
 	@echo "$(GREEN)✓ Gradle wrapper found$(NC)"
 
 check-tools: ## Check additional development tools
